@@ -2,6 +2,8 @@
   "github": {
     "merger": 1,
     "gaa": 1,
-    "pmbp": true
+    "tests": [
+      "make test"
+    ]
   }
 }
