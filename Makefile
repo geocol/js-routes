@@ -14,5 +14,6 @@ test: test-js
 
 test-js:
 	docker run --rm -v $(PWD):/app -w /app node t/routes-tests.js
+	docker run --rm -v $(PWD):/app -w /app node t/routepoints-tests.js
 
 ## License: Public Domain.
