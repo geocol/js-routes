@@ -35,6 +35,7 @@ function associatePoints (points, routePoints) {
   let mins = [];
   if (hasMissing) {
     let matched2 = [];
+    let hasNoNears = false;
     let th2 = 100*100;
     for (let i in points) {
       let n = points[i];
@@ -53,23 +54,53 @@ function associatePoints (points, routePoints) {
         matched2[i] = nears[i].filter (_ => _[1] < th2).map (_ => _[0]);
       } else {
         matched2[i] = [];
+        hasNoNears = true;
       }
     }
 
     hasMissing = false;
     let pi = -1;
+    let used = [];
     N: for (let i in points) {
       let n = points[i];
       for (let j of matched2[i]) {
         if (pi < j) {
           pi = n.routeIndex = j;
+          used[j] = true;
           continue N;
         }
       }
       hasMissing = true;
       mins[i] = pi;
     } // N
-  }
+
+    if (hasMissing && !hasNoNears) {
+      hasMissing = false;
+      I: for (let i in points) {
+        let n = points[i];
+        if (n.routeIndex == null) {
+          for (let j of matched2[i]) {
+            if (!used[j]) {
+              n.routeIndex = j;
+              used[j] = true;
+              continue I;
+            }
+          }
+          hasMissing = true;
+        }
+      } // I
+
+      if (hasMissing) {
+        I: for (let i in points) {
+          let n = points[i];
+          if (n.routeIndex == null) {
+            n.routeIndex = matched2[i][0];
+          }
+        } // I
+      }
+      return;
+    }
+  } // hasMissing
 
   if (hasMissing) {
     let pi = Infinity;
@@ -103,7 +134,7 @@ function associatePoints (points, routePoints) {
         }
       }
     } // N
-  }
+  } // hasMissing
 } // associatePoints
 
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
@@ -117,7 +148,7 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   
 /*
 
-Copyright 2024 Wakaba <wakaba@suikawiki.org>.
+Copyright 2024-2025 Wakaba <wakaba@suikawiki.org>.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as

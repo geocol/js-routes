@@ -12,8 +12,10 @@ src/encodedpolyline.js:
 
 test: test-js
 
-test-js:
+test-js: test-js-1 test-js-2
+test-js-1:
 	docker run --rm -v $(PWD):/app -w /app node t/routes-tests.js
+test-js-2:
 	docker run --rm -v $(PWD):/app -w /app node t/routepoints-tests.js
 
 ## License: Public Domain.
