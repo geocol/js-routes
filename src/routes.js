@@ -99,22 +99,20 @@ function getNearest (points, p) {
     return segments.reverse ();
   } // findNears
 
-function computeBase (pointsList, radius, computed) {
+function computeBase (pointsList, radius, computed, {thresholdFactor = 1} = {}) {
   let start = performance.now ();
 
   let threshold = 0.000001;
-    if (pointsList[0].length) {
-      let distancePerLat = distanceH84 (pointsList[0][0],
-                                        {lat: pointsList[0][0].lat + 1,
-                                         lon: pointsList[0][0].lon});
-      let distancePerLon = distanceH84 (pointsList[0][0],
-                                        {lat: pointsList[0][0].lat,
-                                         lon: pointsList[0][0].lon + 1});
-      threshold = radius / distancePerLat;
-      threshold = threshold * threshold;
-    }
-    let thresholdC = threshold * 3*3;
-    let thresholdCP = thresholdC;
+  if (pointsList[0].length) {
+    let distancePerLat = distanceH84 (pointsList[0][0],
+                                      {lat: pointsList[0][0].lat + 1,
+                                       lon: pointsList[0][0].lon});
+    threshold = radius / distancePerLat;
+    threshold = threshold * threshold;
+  }
+  threshold *= thresholdFactor;
+  let thresholdC = threshold * 3*3;
+  let thresholdCP = thresholdC;
   computed.thresholdMInput = radius;
   computed.threshold = threshold;
   computed.thresholdC = thresholdC;
@@ -348,11 +346,12 @@ function computeData (pointsList, computed) {
   let nears = computed.baseNears;
   let phases = computed.basePhases;
   let i2p = computed._i2p;
-  
+
     let dataPoints = [];
     let maxBaseIndex = Infinity;
     {
       let forced = pointsList[2].slice ().sort ((a, b) => a.timestamp - b.timestamp);
+      computed.forced = forced.slice ();
       let o = 0;
       let prevFP;
       for (let p of pointsList[1]) {
@@ -658,7 +657,7 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
 
 /*
   
-Copyright 2019-2024 Wakaba <wakaba@suikawiki.org>.
+Copyright 2019-2026 Wakaba <wakaba@suikawiki.org>.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
